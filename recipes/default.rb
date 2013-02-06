@@ -89,7 +89,8 @@ template "/etc/statsd/config.js" do
 
   config_hash = {
     :port           => node[:statsd][:port],
-    :flushInterval  => node[:statsd][:flush_interval_msecs]
+    :flushInterval  => node[:statsd][:flush_interval_msecs],
+    :backends       => backends
   }.merge(node[:statsd][:extra_config])
 
   if node[:statsd][:graphite_enabled]
