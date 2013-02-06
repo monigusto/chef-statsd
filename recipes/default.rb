@@ -68,9 +68,19 @@ node[:statsd][:backends].each do |k, v|
     name= k
   end
 
-  npm_package "#{name}"
+  # Requires sudo to make it use the correct user
+  npm_package "#{name}" do
+    version "#{v}" if v
+    action :install_local
+    path "/usr/share/statsd"
+  end
 
   backends << k
+end
+
+directory "/usr/share/statsd" do
+    owner 'statsd'
+    action :create
 end
 
 template "/etc/statsd/config.js" do
