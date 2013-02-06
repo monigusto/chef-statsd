@@ -49,16 +49,27 @@ dpkg_package "statsd" do
   source "#{node[:statsd][:tmp_dir]}/statsd_#{node[:statsd][:package_version]}_all.deb"
 end
 
+service "statsd" do
+  action [ :enable, :start ]
+end
+
 template "/etc/statsd/config.js" do
   source "config.js.erb"
   mode 0644
-  variables(
-    :port => node[:statsd][:port],
-    :graphitePort => node[:statsd][:graphite_port],
-    :graphiteHost => node[:statsd][:graphite_host]
-  )
 
-  notifies :restart, "service[statsd]"
+  config_hash = {
+    :port           => node[:statsd][:port],
+    :flushInterval  => node[:statsd][:flush_interval_msecs]
+  }.merge(node[:statsd][:extra_config])
+
+  if node[:statsd][:graphite_enabled]
+    config_hash[:graphitePort] = node[:statsd][:graphite_port]
+    config_hash[:graphiteHost] = node[:statsd][:graphite_host]
+  end
+
+  variables(:config_hash => config_hash)
+
+  notifies :restart, resources(:service => 'statsd')
 end
 
 cookbook_file "/usr/share/statsd/scripts/start" do
@@ -77,6 +88,3 @@ user node[:statsd][:user] do
   shell "/bin/false"
 end
 
-service "statsd" do
-  action [ :enable, :start ]
-end
