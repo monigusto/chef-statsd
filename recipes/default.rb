@@ -49,8 +49,8 @@ dpkg_package "statsd" do
   source "#{node[:statsd][:tmp_dir]}/statsd_#{node[:statsd][:package_version]}_all.deb"
 end
 
-template "/etc/statsd/rdioConfig.js" do
-  source "rdioConfig.js.erb"
+template "/etc/statsd/config.js" do
+  source "config.js.erb"
   mode 0644
   variables(
     :port => node[:statsd][:port],
