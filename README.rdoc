@@ -16,6 +16,10 @@ Ubuntu 11.04 (Natty)
 * statsd/repo : The gitrepo to use "git://github.com/etsy/statsd.git"
 * statsd/sha  : The sha checksum of the repo to use
 
+TODO:
+* statsd/backend
+* add more options here
+
 = USAGE:
 
 Include the statsd recipe, which will checkout Statsd from git, build a Debian package from it, 
@@ -25,6 +29,15 @@ By default statsd will attempt to send statistics to a graphite instance running
 can be configured using the Graphite cookbook at http://community.opscode.com/cookbooks/graphite.
 
 = CAVEATS:
+This cookbook depends on :
 
-This cookbook has only been tested on Ubuntu Natty (11.04). That is due to it using the "nodejs" package
-rather then attempting to build Node from source.
+- git cookbook : to fetch the statsd code
+- nodejs cookbook : to install nodejs (default from source, but use flags to do it from package)
+- npm cookbook : to install backends (the community published one is broken)
+     we have a fork on monigusto
+
+= KUDOS:
+This cookbook assembles ideas from:
+
+- librato/statsd cookbook - <https://github.com/librato/statsd-cookbook>
+- Now I need to look into merging with - <https://github.com/hectcastro/chef-statsd>

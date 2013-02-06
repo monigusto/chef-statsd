@@ -54,6 +54,25 @@ service "statsd" do
   action [ :enable, :start ]
 end
 
+# Install backends
+backends = []
+
+if node[:statsd][:graphite_enabled]
+  backends << "./backends/graphite"
+end
+
+node[:statsd][:backends].each do |k, v|
+  if v
+    name = "#{k}@#{v}"
+  else
+    name= k
+  end
+
+  npm_package "#{name}"
+
+  backends << k
+end
+
 template "/etc/statsd/config.js" do
   source "config.js.erb"
   mode 0644
@@ -78,9 +97,30 @@ cookbook_file "/usr/share/statsd/scripts/start" do
   mode 0755
 end
 
-cookbook_file "/etc/init/statsd.conf" do
-  source "upstart.conf"
-  mode 0644
+
+case node["platform_family"]
+when "debian"
+  template "/etc/init/statsd.conf" do
+    mode "0644"
+    source "upstart.conf.erb"
+    variables(
+      :log_file         => node[:statsd][:log_file],
+      :platform_version => node["platform_version"].to_f
+    )
+  end
+when "rhel","fedora"
+  template "/etc/init.d/statsd" do
+    mode "0755"
+    source "initd.erb"
+    variables(
+      :log_file         => node[:statsd][:log_file]
+    )
+  end
+end
+
+file node[:statsd][:log_file] do
+  owner "statsd"
+  action :create
 end
 
 user node[:statsd][:user] do
