@@ -61,6 +61,17 @@ if node[:statsd][:graphite_enabled]
   backends << "./backends/graphite"
 end
 
+user node[:statsd][:user] do
+  comment "statsd"
+  system true
+  shell "/bin/false"
+end
+
+directory "/usr/share/statsd" do
+    owner node[:statsd][:user]
+    action :create
+end
+
 node[:statsd][:backends].each do |k, v|
   if v
     name = "#{k}@#{v}"
@@ -78,10 +89,6 @@ node[:statsd][:backends].each do |k, v|
   backends << k
 end
 
-directory "/usr/share/statsd" do
-    owner 'statsd'
-    action :create
-end
 
 template "/etc/statsd/config.js" do
   source "config.js.erb"
@@ -134,9 +141,4 @@ file node[:statsd][:log_file] do
   action :create
 end
 
-user node[:statsd][:user] do
-  comment "statsd"
-  system true
-  shell "/bin/false"
-end
 
