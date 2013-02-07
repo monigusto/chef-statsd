@@ -22,7 +22,7 @@ TODO:
 
 = USAGE:
 
-Include the statsd recipe, which will checkout Statsd from git, build a Debian package from it, 
+Include the statsd recipe, which will checkout Statsd from git, build a Debian package from it,
 and then install the package. Statsd is run under a "statsd" system user.
 
 By default statsd will attempt to send statistics to a graphite instance running on localhost, which
@@ -33,6 +33,11 @@ This cookbook depends on :
 
 - git cookbook : to fetch the statsd code
 - nodejs cookbook : to install nodejs (default from source, but use flags to do it from package)
+
+    "nodejs": {
+      "install_method": "package"
+    },
+
 - npm cookbook : to install backends (the community published one is broken)
      we have a fork on monigusto
 
